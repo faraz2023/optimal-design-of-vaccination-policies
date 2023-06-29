@@ -135,21 +135,6 @@ def calc_graph_connectivity(G, experiment_type, T=1):
             pairwise_connectivity += (len(i) * (len(i) - 1)) / 2
         pc = pairwise_connectivity / _CN_denom
         return pc
-    elif(experiment_type == "R0"):
-        # get gcc
-        gcc_nodes = max(nx.connected_components(G), key=len)
-        G = G.subgraph(gcc_nodes)
-
-        degree_array = np.array(list(dict(nx.degree(G)).values()))
-        square_degree_array = degree_array**2
-
-        denom = calc_weighted_avg(degree_array)
-        if(denom == 0):
-            R_0 = 0
-        else:
-            R_0 = round(
-                T * ((calc_weighted_avg(square_degree_array)/denom) - 1), 2)
-        return R_0
     elif(experiment_type == "GCC"):
         maxCC = len(max(nx.connected_components(G), key=len))
         #print(maxCC , _g_num_nodes)
@@ -194,3 +179,4 @@ def partition_G(G, num_partition):
             G.nodes[vertex]["partition"] = partition
 
     return G, partitions
+
