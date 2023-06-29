@@ -41,3 +41,17 @@ python DCNDP_2hop_Partition_Raw.py --export_path DCNDP_NL_D2_2hop_raw --input_pa
 python DCNDP_2hop_Partition_Raw.py --export_path DCNDP_NL_D2_2hop_raw_disagg --input_path DCNDP_Datasets/NL_Day2 --num_partition 200 --partition_remove_budget 0.2 --timelimit 3600 --disaggragated_constraints
 
 ```
+
+
+## 1-hop experiments
+
+Run:
+
+```
+# First partitions the network using dividing_col (here health authority), then partition via METIS
+python DCNDP_1hop_Partition_Regional.py --export_path DCNDP_NL_D2_1hop_healthAuthority_ID --input_path DCNDP_Datasets/NL_Day2 --dividing_col healthAuthority_ID --partition_avg_size 25000 --partition_remove_budget 0.2 --timelimit 3600 
+```
+
+```
+python DCNDP_1hop_Partition_Raw.py --export_path DCNDP_NL_D2_1hop_raw --input_path DCNDP_Datasets/NL_Day2 --num_partition 20 --partition_remove_budget 0.2 --timelimit 3600
+```
