@@ -1,4 +1,5 @@
-# DCNDP_IP
+# Optimal design of vaccination policies: A case study for Newfoundland and Labrador
+
 GitHub repository for **Optimal design of vaccination policies: A case study for Newfoundland and Labrador** by Faraz Khoshbakhtian, Hamidreza Validi, Mario Ventresca, and Dionne
 Aleman.
 
