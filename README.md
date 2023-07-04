@@ -1,6 +1,6 @@
 # DCNDP_IP
-GitHub repository for work **Faraz Khoshbakhtian, Hamidreza Validi, Mario Ventresca, Dionne
-Aleman. Optimal design of vaccination policies: A case study for Newfoundland and Labrador**.
+GitHub repository for **Optimal design of vaccination policies: A case study for Newfoundland and Labrador** by Faraz Khoshbakhtian, Hamidreza Validi, Mario Ventresca, and Dionne
+Aleman.
 
 ## Setting up the environment
 
