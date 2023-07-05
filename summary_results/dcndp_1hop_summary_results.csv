@@ -1,4 +1,4 @@
-healthAuthority_ID,partition,c_count,component_size,component_edges,budget,pre_optimization_short_pairs,m_status,m_obj,m_MIPGap,m_runtime,density,perc_reduction_obj
+healthAuthority_ID,partition,c_count,component_size,component_edges,budget,original_objective,m_status,m_obj,m_MIPGap,m_runtime,density,perc_reduction_obj
 0,0,0,24296,130261,4859,130261,9,48091.0,2.96313239483479,3600.033999919892,0.04413597462265319,63.081044978926926
 0,1,0,24243,180160,4848,180160,9,41085.0,2.85992454667153,3600.9049999713898,0.061310316836001875,77.19527087033748
 0,2,0,22855,127744,4571,127744,9,41613.0,2.826039939442,3600.2400000095367,0.048913310572546755,67.42469313627255
