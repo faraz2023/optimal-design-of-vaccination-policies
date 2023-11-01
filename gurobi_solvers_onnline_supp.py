@@ -91,13 +91,19 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
     # Constraints
     pg_minus_g_edges = set(PG.edges) - set(G.edges)
 
-    #2b
+    #2b and 2f
     for u, v in pg_minus_g_edges:
         common_neighbors = list(nx.common_neighbors(G, u, v))
         common_neighbors_count = len(common_neighbors)
         
+        # b part
         quicksum_common_neighbors = gp.quicksum((1 - Y[i]) for i in common_neighbors)
         m.addConstr((1 / common_neighbors_count) * quicksum_common_neighbors - Y[u] - Y[v] <= X[u, v])
+
+        # f part
+        quicksum_common_neighbors = gp.quicksum(Y[i] for i in common_neighbors)
+        m.addConstr(quicksum_common_neighbors - Y[u] - Y[v] <= common_neighbors_count - X[u, v])
+
     
     #2c
     m.addConstrs(1 - Y[u] - Y[v] <= X[u, v] for u, v in G.edges)
@@ -106,14 +112,7 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
 
     #2e
     m.addConstrs(Y[v] <= 1 - X[(min(e), max(e))] for v in G.nodes for e in PG.edges(v))
-
-    #2f
-    for u, v in pg_minus_g_edges:
-        common_neighbors = list(nx.common_neighbors(G, u, v))
-        common_neighbors_count = len(common_neighbors)
         
-        quicksum_common_neighbors = gp.quicksum(Y[i] for i in common_neighbors)
-        m.addConstr(quicksum_common_neighbors - Y[u] - Y[v] <= common_neighbors_count - X[u, v])
 
     #2g
     m.addConstrs(1 - X[e] == Q[e] + Z[e] for e in PG.edges)
