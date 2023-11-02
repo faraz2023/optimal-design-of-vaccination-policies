@@ -14,9 +14,10 @@ def solve_modified_1hop_DCND(G, b, timelimit=None, MIPgap=None, threads=16, warm
     if MIPgap:
         m.setParam('MIPGap', MIPgap)
 
+    G_edges_min_ordering = [(min(e), max(e)) for e in G.edges]
     # Define variables
     Y = m.addVars(G.nodes, vtype=GRB.BINARY, name="Y")
-    X = m.addVars(G.edges, vtype=GRB.BINARY, name="X") # Binary or continous?
+    X = m.addVars(G_edges_min_ordering, vtype=GRB.BINARY, name="X") # Binary or continous?
     Q = m.addVars(G.edges, vtype=GRB.CONTINUOUS, name="Q")
     Z = m.addVars(G.edges, vtype=GRB.CONTINUOUS, name="Z")
     W = {e: ineffective_coefficient for e in G.edges} # vaccine inffectiveness coeficient
@@ -29,16 +30,16 @@ def solve_modified_1hop_DCND(G, b, timelimit=None, MIPgap=None, threads=16, warm
     # Constraints
     print("-=======")
 
-    m.addConstrs(1 - Y[u] - Y[v] <= X[u, v] for u, v in G.edges)
+    m.addConstrs(1 - Y[u] - Y[v] <= X[(min([u,v]), max([u,v]))] for u, v in G.edges)
     m.addConstr(gp.quicksum(Y) <= b)
     m.addConstrs(Y[v] <= 1 - X[(min(e), max(e))] for v in G.nodes for e in G.edges(v))
-    m.addConstrs(1 - X[e] == Q[e] + Z[e] for e in G.edges)
+    m.addConstrs(1 - X[(min(e), max(e))] == Q[e] + Z[e] for e in G.edges)
     m.addConstrs(Y[u] + Y[v] <= 1 + Z[u, v] for u, v in G.edges)
     m.addConstrs(Z[u, v] <= Y[u] for u, v in G.edges)
     m.addConstrs(Z[u, v] <= Y[v] for u, v in G.edges)
 
     # Objective function
-    obj = gp.quicksum(X[e] for e in G.edges) + gp.quicksum(W[e] * Q[e] for e in G.edges) + gp.quicksum(W[e]**2 * Z[e] for e in G.edges)
+    obj = gp.quicksum(X[(min(e), max(e))] for e in G.edges) + gp.quicksum(W[e] * Q[e] for e in G.edges) + gp.quicksum(W[e]**2 * Z[e] for e in G.edges)
     m.setObjective(obj, GRB.MINIMIZE)
 
     print("All constraints added")

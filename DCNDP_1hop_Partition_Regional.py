@@ -10,7 +10,7 @@ import numpy as np
 import os
 import time
 import random
-from gurobi_solvers import solve_1hop_DCND
+#from gurobi_solvers import solve_1hop_DCND
 from utils import make_dir, sol_to_txt,  calc_graph_connectivity, agile_HDA, partition_G
 import multiprocessing
 import shutil
@@ -58,6 +58,7 @@ def solve_attributed_hybrid_DNCDP_1hop(G, partitions, export_path, hybrid_rate):
         for _part in range(num_partition):
             print("-----------------------------------")
             _part_nodes = [str(x) for x in current_community[_part]]
+            #_part_nodes = current_community[_part]
             print("Len of current part nodes: ", len(_part_nodes))        
 
             H = G.subgraph(_part_nodes)
@@ -136,7 +137,16 @@ def solve_attributed_hybrid_DNCDP_1hop(G, partitions, export_path, hybrid_rate):
                         gurobi_warm_sol = None
                         gurobi_start_time = time.time()
                         
-                        m, gurobi_sol = solve_1hop_DCND(H_prime, gurobi_K, warm_start=gurobi_warm_sol, timelimit=TIMELIMIT, threads=num_threads)
+                        if(args.consider_vaccine_ineffectiveness):
+                            from gurobi_solvers_onnline_supp import solve_modified_1hop_DCND
+                            print("Taking vaccine effectiveness into account")
+                            print("Employing the modified 1hop DCND solver")
+                            m, gurobi_sol = solve_modified_1hop_DCND(H_prime, gurobi_K, warm_start=gurobi_warm_sol, timelimit=TIMELIMIT, threads=num_threads)
+                        else:
+                            from gurobi_solvers import solve_1hop_DCND
+                            print("NOT taking vaccine effectiveness into account")
+                            print("Employing the original 1hop DCND solver")
+                            m, gurobi_sol = solve_1hop_DCND(H_prime, gurobi_K, warm_start=gurobi_warm_sol, timelimit=TIMELIMIT, threads=num_threads)
 
                         
                         gurobi_end_time = time.time()
@@ -351,6 +361,8 @@ def solve_attributed_DCNDP_1hop(G, G_attributes_df, export_path):
         partitions = json.load(open(os.path.join(export_path, "partitions.json")))
         print("====== Loaded G, and Partitions dict again to make sure things work ======")
 
+    #G = nx.relabel_nodes(G, mapping={node: int(i) for i, node in enumerate(G.nodes())})
+    #print("Finished turning nodes into INT")
 
     hybrid_rates = [0,1]
     
@@ -439,9 +451,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
+
+
     parser.add_argument('--dividing_col', type=str, default='healthAuthority_ID', help='What column to divide the graph by (default: healthAuthority_ID)')
     parser.add_argument('--export_path', type=str, required=True, help='Path to the output solution')
     parser.add_argument('--input_path', type=str, default=os.path.join(".", "DCNDP_Datasets", 'NL_Day2'), help='Input graph path')
+
+    parser.add_argument('--consider_vaccine_ineffectiveness', action='store_true', help='Consider vaccine ineffectiveness')
 
     parser.add_argument('--partition_avg_size', type=int, default=2500, help='partition avg size')
     parser.add_argument('--partition_remove_budget', type=float, default=0.2, help='Node budget for each partitions')

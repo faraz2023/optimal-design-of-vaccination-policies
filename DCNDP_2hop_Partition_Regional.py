@@ -461,6 +461,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
+    # Something like this DCNDP_sols/DCNDP_NL_D2_2023_06_14_healthAuthority_ID
     parser.add_argument('--dividing_col', type=str, default='healthAuthority_ID', help='What column to divide the graph by (default: healthAuthority_ID)')
     parser.add_argument('--export_path', type=str, required=True, help='Path to the output solution')
     parser.add_argument('--input_path', type=str, default=os.path.join(".", "DCNDP_Datasets", 'NL_Day2'), help='Input graph path')
