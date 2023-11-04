@@ -1,7 +1,4 @@
-## This program is buggy!!! Run it for the first time and you you will generate the partitions
-## information. The program crashes the first time around. Go into the directory and delete 
-## partitions_results.csv file and re run the program. This time it should work. 
-## Sorry! This bug will be fixed soon. 
+
 import warnings
 import networkx as nx
 import gurobipy as gp
