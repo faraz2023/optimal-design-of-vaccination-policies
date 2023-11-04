@@ -6,7 +6,7 @@ import numpy as np
 import os
 import time
 import random
-from gurobi_solvers import solve_2hop_DCND
+#from gurobi_solvers import solve_2hop_DCND
 from utils import make_dir, sol_to_txt, get_total_2hop_connectivity,\
     calc_graph_connectivity, agile_HDA, fix_simplicials, partition_G
 import multiprocessing
@@ -148,7 +148,22 @@ def solve_attributed_hybrid_DNCDP(G, partitions, export_path, hybrid_rate):
                             num_simplicials = len(fixed_simplicial_nodes)
 
                         gurobi_start_time = time.time()
-                        m, gurobi_sol, new_short_pairs, original_short_pairs = solve_2hop_DCND(H_prime, gurobi_K, timelimit=TIMELIMIT,
+
+                        if(args.consider_vaccine_ineffectiveness):
+                            from gurobi_solvers_online_supp import solve_modified_2hop_DCND
+                            print("Taking vaccine effectiveness into account")
+                            print("Employing the modified 1hop DCND solver")
+                            m, gurobi_sol, new_short_pairs, original_short_pairs = solve_modified_2hop_DCND(H_prime, gurobi_K, timelimit=TIMELIMIT,
+                                            MIPgap=0.0, warm_start=gurobi_warm_sol, env=None,
+                                            threads=num_threads, fixed_simplicial=fixed_simplicial_nodes,
+                                            budget_constr='leq', X_binary=True,  aggregated_constraints=aggregated_constraints, ineffective_coefficient=args.vaccine_ineffectiveness_rate)
+
+
+                        else:
+                            from gurobi_solvers import solve_2hop_DCND
+                            print("NOT taking vaccine effectiveness into account")
+                            print("Employing the original 1hop DCND solver")
+                            m, gurobi_sol, new_short_pairs, original_short_pairs = solve_2hop_DCND(H_prime, gurobi_K, timelimit=TIMELIMIT,
                                             MIPgap=0.0, warm_start=gurobi_warm_sol, env=None,
                                             threads=num_threads, fixed_simplicial=fixed_simplicial_nodes,
                                             budget_constr='leq', X_binary=True,  aggregated_constraints=aggregated_constraints)
@@ -465,6 +480,9 @@ if __name__ == "__main__":
     parser.add_argument('--dividing_col', type=str, default='healthAuthority_ID', help='What column to divide the graph by (default: healthAuthority_ID)')
     parser.add_argument('--export_path', type=str, required=True, help='Path to the output solution')
     parser.add_argument('--input_path', type=str, default=os.path.join(".", "DCNDP_Datasets", 'NL_Day2'), help='Input graph path')
+
+    parser.add_argument('--consider_vaccine_ineffectiveness', action='store_true', help='Consider vaccine ineffectiveness')
+    parser.add_argument('--vaccine_ineffectiveness_rate', type=float, default=0.05, help='Vaccine ineffectiveness rate')
 
     parser.add_argument('--partition_avg_size', type=int, default=2500, help='partition avg size')
     parser.add_argument('--partition_remove_budget', type=float, default=0.2, help='Node budget for each partitions')

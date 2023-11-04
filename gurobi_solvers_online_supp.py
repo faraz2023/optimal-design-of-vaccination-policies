@@ -73,10 +73,12 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
 
     # create y variables
     Y = m.addVars(PG.nodes, vtype=GRB.BINARY)
+
+    PG_edges_min_ordering = [(min(e), max(e)) for e in PG.edges]
     if(X_binary):
-        X = m.addVars(PG.edges, vtype=GRB.BINARY)
+        X = m.addVars(PG_edges_min_ordering, vtype=GRB.BINARY)
     else:
-        X = m.addVars(PG.edges, vtype=GRB.CONTINUOUS)
+        X = m.addVars(PG_edges_min_ordering, vtype=GRB.CONTINUOUS)
     Q = m.addVars(PG.edges, vtype=GRB.CONTINUOUS)
     Z = m.addVars(PG.edges, vtype=GRB.CONTINUOUS)
     W = {e: ineffective_coefficient for e in PG.edges}  # vaccine inffectiveness coeficient
@@ -99,24 +101,24 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
         
         # b part
         quicksum_common_neighbors = gp.quicksum((1 - Y[i]) for i in common_neighbors)
-        m.addConstr((1 / common_neighbors_count) * quicksum_common_neighbors - Y[u] - Y[v] <= X[u, v])
+        m.addConstr((1 / common_neighbors_count) * quicksum_common_neighbors - Y[u] - Y[v] <= X[min(u, v), max(u, v)])
 
         # f part
         quicksum_common_neighbors = gp.quicksum(Y[i] for i in common_neighbors)
-        m.addConstr(quicksum_common_neighbors - Y[u] - Y[v] <= common_neighbors_count - X[u, v])
+        m.addConstr(quicksum_common_neighbors - Y[u] - Y[v] <= common_neighbors_count - X[min(u, v), max(u, v)])
 
     
     #2c
-    m.addConstrs(1 - Y[u] - Y[v] <= X[u, v] for u, v in G.edges)
+    m.addConstrs(1 - Y[u] - Y[v] <= X[min(u, v), max(u, v)] for u, v in G.edges)
     #2d
     m.addConstr(gp.quicksum(Y) <= b)
 
     #2e
-    m.addConstrs(Y[v] <= 1 - X[(min(e), max(e))] for v in G.nodes for e in PG.edges(v))
+    m.addConstrs(Y[v] <= 1 - X[min(e), max(e)] for v in G.nodes for e in PG.edges(v))
         
 
     #2g
-    m.addConstrs(1 - X[e] == Q[e] + Z[e] for e in PG.edges)
+    m.addConstrs(1 - X[min(e), max(e)] == Q[e] + Z[e] for e in PG.edges)
 
     #2h
     m.addConstrs(Y[u] + Y[v] <= 1 + Z[u, v] for u, v in PG.edges)
@@ -124,7 +126,7 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
     m.addConstrs(Z[u, v] <= Y[v] for u, v in PG.edges)
 
     # Objective function
-    obj = gp.quicksum(X[e] for e in PG.edges) + gp.quicksum(W[e] * Q[e] + W[e]**2 * Z[e] for e in G.edges) + gp.quicksum(W[e]**2 * Q[e] + W[e]**4 * Z[e] for e in pg_minus_g_edges)
+    obj = gp.quicksum(X[min(e), max(e)] for e in PG.edges) + gp.quicksum(W[e] * Q[e] + W[e]**2 * Z[e] for e in G.edges) + gp.quicksum(W[e]**2 * Q[e] + W[e]**4 * Z[e] for e in pg_minus_g_edges)
     m.setObjective(obj, GRB.MINIMIZE)
 
     print("All constraints added")

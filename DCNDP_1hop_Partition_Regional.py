@@ -135,7 +135,7 @@ def solve_attributed_hybrid_DNCDP_1hop(G, partitions, export_path, hybrid_rate):
                         gurobi_start_time = time.time()
                         
                         if(args.consider_vaccine_ineffectiveness):
-                            from gurobi_solvers_onnline_supp import solve_modified_1hop_DCND
+                            from gurobi_solvers_online_supp import solve_modified_1hop_DCND
                             print("Taking vaccine effectiveness into account")
                             print("Employing the modified 1hop DCND solver")
                             m, gurobi_sol = solve_modified_1hop_DCND(H_prime, gurobi_K, warm_start=gurobi_warm_sol, timelimit=TIMELIMIT, threads=num_threads)
