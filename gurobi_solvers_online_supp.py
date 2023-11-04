@@ -137,7 +137,7 @@ def solve_modified_2hop_DCND(G, b, timelimit=None, MIPgap=None, threads=10,
     critical_nodes = [vertex for vertex in PG.nodes if Y[vertex].x > 0.5]
     print("# of critical nodes: ", len(critical_nodes))
 
-    short_pairs = [edge for edge in PG.edges if X[edge].x > 0.5]
+    short_pairs = [edge for edge in PG.edges if X[min(edge), max(edge)].x > 0.5]
     print("# of remaining short pairs: ", len(short_pairs))
 
     return m, critical_nodes, short_pairs, len(PG.edges)
