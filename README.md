@@ -1,6 +1,6 @@
 # Optimal design of vaccination policies: A case study for Newfoundland and Labrador
 
-GitHub repository for **Optimal design of vaccination policies: A case study for Newfoundland and Labrador** by Faraz Khoshbakhtian, Hamidreza Validi, Mario Ventresca, and Dionne
+GitHub repository for [Optimal design of vaccination policies: A case study for Newfoundland and Labrador](https://www.sciencedirect.com/science/article/abs/pii/S0167637724000762?dgcid=author) by Faraz Khoshbakhtian, Hamidreza Validi, Mario Ventresca, and Dionne
 Aleman.
 
 ## Setting up the environment
